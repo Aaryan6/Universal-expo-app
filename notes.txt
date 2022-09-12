@@ -1,0 +1,4 @@
+Navigation ✅
+Edit Profile ✅
+Authentication with firebase
+keep logged in using Async Storage ✅
