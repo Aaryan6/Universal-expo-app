@@ -1,4 +1,5 @@
 Navigation ✅
 Edit Profile ✅
-Authentication with firebase
+Authentication with firebase ✅
 keep logged in using Async Storage ✅
+user login and make Profile and store, after he re login his data are shows

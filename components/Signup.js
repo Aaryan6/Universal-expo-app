@@ -1,14 +1,17 @@
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { auth } from "../firebase";
-import { useNavigation } from "@react-navigation/native";
 
-const Signup = () => {
-  const [name, setName] = useState("");
-  const [bio, setBio] = useState("");
+const Signup = ({ navigation }) => {
+  const [username, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const navigation = useNavigation();
+
+  useEffect(() => {
+    if (auth.currentUser) {
+      navigation.replace("TabScreen", { screen: "Home" });
+    }
+  }, []);
 
   const handleSignup = async () => {
     try {
@@ -16,9 +19,9 @@ const Signup = () => {
         .createUserWithEmailAndPassword(email, password)
         .then((userCredentials) => {
           userCredentials.user.updateProfile({
-            displayName: name,
+            displayName: username,
           });
-          navigation.navigate("Login");
+          navigation.replace("TabScreen", { screen: "Home" });
         })
         .catch((err) => console.log(err));
     } catch (error) {
@@ -27,7 +30,7 @@ const Signup = () => {
   };
 
   const goToRegister = () => {
-    navigation.navigate("Login");
+    navigation.replace("StackScreen", { screen: "Login" });
   };
   return (
     <View style={styles.container}>
@@ -35,26 +38,20 @@ const Signup = () => {
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.inputField}
-          value={name}
-          onChangeText={(text) => setName(text)}
+          value={username}
+          onChangeText={setUserName}
           placeholder="Your Name"
         />
         <TextInput
           style={styles.inputField}
-          value={bio}
-          onChangeText={(text) => setBio(text)}
-          placeholder="Bio"
-        />
-        <TextInput
-          style={styles.inputField}
           value={email}
-          onChangeText={(text) => setEmail(text)}
+          onChangeText={setEmail}
           placeholder="Email"
         />
         <TextInput
           style={styles.inputField}
           value={password}
-          onChangeText={(text) => setPassword(text)}
+          onChangeText={setPassword}
           placeholder="Password"
           onSubmitEditing={handleSignup}
         />

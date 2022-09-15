@@ -1,57 +1,58 @@
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
-import React, { useState } from "react";
+import {
+  Alert,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
+import React, { useState, useEffect } from "react";
 import { auth } from "../firebase";
-import { useNavigation } from "@react-navigation/native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const Login = () => {
+const Login = ({ navigation }) => {
   const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
   const [password, setPassword] = useState("");
-  const navigation = useNavigation();
+
+  useEffect(() => {
+    if (auth.currentUser) {
+      navigation.replace("TabScreen", { screen: "Home" });
+    }
+  }, []);
 
   const handleLogin = async () => {
-    try {
-      auth
-        .signInWithEmailAndPassword(email, password)
-        .then((userCredentials) => {
-          const data = {
-            email: userCredentials.user.email,
-            name: userCredentials.user.displayName,
-          };
-          const storeData = async () => {
-            try {
-              await AsyncStorage.setItem("@storage_Key", JSON.stringify(data));
-            } catch (error) {
-              console.log(error);
-            }
-          };
-          storeData();
-          navigation.navigate("Home");
-        })
-        .catch((err) => console.log(err));
-    } catch (error) {
-      console.log(error);
+    if (email !== "" && password !== "") {
+      try {
+        auth
+          .signInWithEmailAndPassword(email, password)
+          .then((userCredentials) => {
+            navigation.replace("TabScreen", { screen: "Home" });
+          })
+          .catch((err) => console.log(err));
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      Alert.alert("Fill the form");
     }
   };
 
   const goToRegister = () => {
-    navigation.navigate("Signup");
+    navigation.replace("StackScreen", { screen: "Signup" });
   };
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Sign in {name ? "Welcome " + name : ""}</Text>
+      <Text style={styles.header}>Sign in</Text>
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.inputField}
           value={email}
-          onChangeText={(text) => setEmail(text)}
+          onChangeText={setEmail}
           placeholder="Email"
         />
         <TextInput
           style={styles.inputField}
           value={password}
-          onChangeText={(text) => setPassword(text)}
+          onChangeText={setPassword}
           placeholder="Password"
           onSubmitEditing={handleLogin}
         />
@@ -109,7 +110,7 @@ const styles = StyleSheet.create({
   },
   linkText: {
     color: "#fc7ad5",
-    marginTop: 5,
+    marginTop: 10,
     textAlign: "center",
     fontSize: 15,
   },
